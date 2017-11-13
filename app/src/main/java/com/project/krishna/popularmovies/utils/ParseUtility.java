@@ -2,6 +2,7 @@ package com.project.krishna.popularmovies.utils;
 
 import android.graphics.Movie;
 import android.net.Uri;
+import android.util.Log;
 
 import com.project.krishna.popularmovies.datamodel.MovieDetails;
 import com.project.krishna.popularmovies.datamodel.Movies;
@@ -77,4 +78,61 @@ public class ParseUtility {
         return moviesList;
     }
 
+    public static MovieDetails getMovieDetails(String movieDetailsJSON,String movieId) {
+        JSONObject movies=null;
+        try {
+            movies = new JSONObject(movieDetailsJSON);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSONArray results=null;
+        try {
+            results = movies.getJSONArray(MOVIE_ARRAY);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        int current=0;
+        MovieDetails  movieDetails=null;
+        while(current<results.length()){
+
+            JSONObject movieRoot=null;
+            try {
+                movieRoot = results.getJSONObject(current);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String mid= null;
+            try {
+                mid = movieRoot.getString(MOVIE_ID_KEY);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if(mid.equals(movieId)){
+
+                String title=null;
+                String overview=null;
+                String releaseDate=null;
+                String backdrop=null;
+                String rating=null;
+                try {
+
+
+                    title = movieRoot.getString("title");
+                    overview = movieRoot.getString("overview");
+                    releaseDate = movieRoot.getString("release_date");
+                    backdrop = movieRoot.getString("backdrop_path");
+                    rating=movieRoot.getString("vote_average");
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+                movieDetails=new MovieDetails(title,backdrop,overview,rating,releaseDate);
+                break;
+            }
+            current++;
+        }
+    return movieDetails;
+
+    }
 }

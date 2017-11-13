@@ -3,4 +3,6 @@
     <string name="poster_name">movie..</string>
     <string name="top_text">Sort-Top rated</string>
     <string name="popular_text">Sort-Popular</string>
+    <string name="release_text">Released On:</string>
+    <string name="rating_text">Rating:</string>
 </resources>

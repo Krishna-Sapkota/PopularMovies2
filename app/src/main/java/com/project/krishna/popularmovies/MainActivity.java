@@ -1,20 +1,24 @@
 package com.project.krishna.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.project.krishna.popularmovies.datamodel.MovieDetails;
 import com.project.krishna.popularmovies.datamodel.Movies;
 import com.project.krishna.popularmovies.datamodel.MoviesAdapter;
 import com.project.krishna.popularmovies.utils.NetworkUtility;
@@ -27,24 +31,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieThumbnailClickListener {
     TextView error;
     RecyclerView mMoviesListRecycler;
+    ProgressBar mLoadingIndicator;
     List<Movies> moviesList;
     boolean sortedByPopular=false;
+    String movieDetailsJSON;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mMoviesListRecycler=(RecyclerView)findViewById(R.id.rv_movies_list);
+        mLoadingIndicator=(ProgressBar)findViewById(R.id.progressBar);
         error=findViewById(R.id.tv_error_message);
+        moviesList=new ArrayList<>();
         loadMoviesThumnail("popular");
 
     }
 
     private void loadMoviesThumnail(String sortBy) {
 
-        moviesList=new ArrayList<>();
         if(sortBy.equals("popular")){
             sortedByPopular=true;
         }
@@ -53,23 +60,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if(isOnline()) {
             MovieDataLoadTask movieDataLoadTask = new MovieDataLoadTask();
-            String movieJSON = null;
-            try {
-                movieJSON = movieDataLoadTask.execute(sortBy).get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            moviesList = ParseUtility.getMoviesList(movieJSON);
-            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);
-            mMoviesListRecycler.setHasFixedSize(true);
-            mMoviesListRecycler.setLayoutManager(layoutManager);
-            MoviesAdapter adapter = new MoviesAdapter(this, moviesList);
-            mMoviesListRecycler.setAdapter(adapter);
+            movieDataLoadTask.execute(sortBy);
         }
         else {
-
             error.setText("No Internet Connection, Try again");
             error.setVisibility(View.VISIBLE);
         }
@@ -137,7 +130,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class MovieDataLoadTask extends AsyncTask<String,Void,String>{
+    public  class MovieDataLoadTask extends AsyncTask<String,Void,String>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+
+        }
+
         @Override
         protected String doInBackground(String... strings) {
             String sortPath=strings[0];
@@ -158,6 +159,31 @@ public class MainActivity extends AppCompatActivity {
             return movieJSON;
         }
 
+        @Override
+        protected void onPostExecute(String movieJSON) {
+            super.onPostExecute(movieJSON);
+            movieDetailsJSON=movieJSON;
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            moviesList = ParseUtility.getMoviesList(movieJSON);
+            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+            mMoviesListRecycler.setHasFixedSize(true);
+            mMoviesListRecycler.setLayoutManager(layoutManager);
+            MoviesAdapter adapter = new MoviesAdapter(getApplicationContext(), moviesList,MainActivity.this);
+            RecyclerView.ItemAnimator itemAnimator=new DefaultItemAnimator();
+            mMoviesListRecycler.setItemAnimator(itemAnimator);
+            mMoviesListRecycler.setAdapter(adapter);
+        }
+    }
+
+    @Override
+    public void onThumnailClick(int clickedIndex) {
+        Log.i("TEST",moviesList.get(clickedIndex).getPosterURL());
+        String clickedMovie=moviesList.get(clickedIndex).getMovieId();
+        MovieDetails movieDetails=ParseUtility.getMovieDetails(movieDetailsJSON,clickedMovie);
+        Intent detailsActivity=new Intent(this,MovieDetailsActivity.class);
+        detailsActivity.putExtra("movie",movieDetails);
+        startActivity(detailsActivity);
+      //  Log.i("TEXT",movieDetails.getOverview());
 
     }
 }

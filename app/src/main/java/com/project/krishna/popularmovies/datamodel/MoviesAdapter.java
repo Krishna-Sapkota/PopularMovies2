@@ -19,9 +19,15 @@ import java.util.List;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PosterViewHolder> {
     List<Movies> moviesList;
     Context context;
+    final private MovieThumbnailClickListener mOnClickListener;
+
+    public interface MovieThumbnailClickListener{
+        public void onThumnailClick(int clickedIndex);
+    }
 
 
-    public MoviesAdapter(Context c,List<Movies> movies){
+    public MoviesAdapter(Context c,List<Movies> movies,MovieThumbnailClickListener listener){
+        mOnClickListener=listener;
         moviesList=movies;
         context=c;
     }
@@ -50,13 +56,19 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PosterView
     }
 
 
-    public  class PosterViewHolder extends RecyclerView.ViewHolder{
+    public  class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView poster;
         public PosterViewHolder(View itemView) {
 
             super(itemView);
             poster=(ImageView)itemView.findViewById(R.id.iv_poster);
+            itemView.setOnClickListener(this);
         }
 
+        @Override
+        public void onClick(View view) {
+         int clickedPosition=getAdapterPosition();
+         mOnClickListener.onThumnailClick(clickedPosition);
+        }
     }
 }

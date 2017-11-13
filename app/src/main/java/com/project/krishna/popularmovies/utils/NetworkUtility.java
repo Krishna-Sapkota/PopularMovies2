@@ -18,7 +18,7 @@ public class NetworkUtility {
 
     public static final String MOVIE_DB_BASE_URL="api.themoviedb.org";
     public static final String MOVIE_DB_BASE_PATH="3/movie";
-    public static final String API_KEY="ENTER YOUR API KEY";
+    public static final String API_KEY="ENTER YOUR OWN API KEY";
 
     public static final String PARAM_API_KEY="api_key";
 
