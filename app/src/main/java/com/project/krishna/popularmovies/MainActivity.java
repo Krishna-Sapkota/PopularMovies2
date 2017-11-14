@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     ProgressBar mLoadingIndicator;
     List<Movies> moviesList;
     boolean sortedByPopular=false;
+    RecyclerView.LayoutManager layoutManager;
+    int lastFirstVisiblePosition=-1;
     String movieDetailsJSON;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +49,30 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mLoadingIndicator=(ProgressBar)findViewById(R.id.progressBar);
         error=findViewById(R.id.tv_error_message);
         moviesList=new ArrayList<>();
-        loadMoviesThumnail("popular");
+
+        if(savedInstanceState!=null) {
+            boolean sortOrder=savedInstanceState.getBoolean("sortedBy");
+            if(sortOrder){
+                loadMoviesThumnail("popular");
+            }
+            else {
+                loadMoviesThumnail("top_rated");
+            }
+        }
+        else {
+            loadMoviesThumnail("popular");
+        }
+
+    }
+
+    /*
+    save the sort order to display same sorting when screen rotates
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("sortedBy",sortedByPopular);
+        Log.i("SORT","BY onsave"+sortedByPopular);
 
     }
 
@@ -165,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             movieDetailsJSON=movieJSON;
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             moviesList = ParseUtility.getMoviesList(movieJSON);
-            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+            layoutManager = new GridLayoutManager(getApplicationContext(), 3);
             mMoviesListRecycler.setHasFixedSize(true);
             mMoviesListRecycler.setLayoutManager(layoutManager);
             MoviesAdapter adapter = new MoviesAdapter(getApplicationContext(), moviesList,MainActivity.this);
@@ -177,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     @Override
     public void onThumnailClick(int clickedIndex) {
-        Log.i("TEST",moviesList.get(clickedIndex).getPosterURL());
         String clickedMovie=moviesList.get(clickedIndex).getMovieId();
         MovieDetails movieDetails=ParseUtility.getMovieDetails(movieDetailsJSON,clickedMovie);
         Intent detailsActivity=new Intent(this,MovieDetailsActivity.class);

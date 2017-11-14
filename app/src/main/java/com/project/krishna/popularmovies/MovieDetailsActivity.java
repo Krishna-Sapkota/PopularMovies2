@@ -3,6 +3,7 @@ package com.project.krishna.popularmovies;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -44,11 +45,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
         Glide.with(this)
                 .load(url.toString())
+                .placeholder(android.R.drawable.progress_indeterminate_horizontal)
                 .into(mMovieThumbnail);
+         //.apply(RequestOptions.bitmapTransform(new CircleCrop()))
+
         mTitle.setText(movieDetails.getTitle());
         mOverview.setText(movieDetails.getOverview());
         mRelease.setText(movieDetails.getReleaseDate());
-        mRating.setText(movieDetails.getRating());
+        mRating.setText(movieDetails.getRating()+"/10");
 
     }
 }
