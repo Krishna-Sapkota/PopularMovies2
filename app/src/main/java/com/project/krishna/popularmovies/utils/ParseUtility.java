@@ -119,7 +119,7 @@ public class ParseUtility {
                 try {
 
 
-                    title = movieRoot.getString("title");
+                    title = movieRoot.getString("original_title");
                     overview = movieRoot.getString("overview");
                     releaseDate = movieRoot.getString("release_date");
                     backdrop = movieRoot.getString("backdrop_path");
