@@ -36,6 +36,7 @@ public class NetworkUtility {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        assert inputStream != null;
         Scanner scanner=new Scanner(inputStream);
         scanner.useDelimiter("\\A");
         boolean hasInput=scanner.hasNext();

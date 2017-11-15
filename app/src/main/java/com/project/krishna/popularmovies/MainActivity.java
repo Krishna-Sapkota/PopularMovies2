@@ -9,15 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.project.krishna.popularmovies.datamodel.MovieDetails;
 import com.project.krishna.popularmovies.datamodel.Movies;
@@ -30,32 +30,33 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieThumbnailClickListener {
-    TextView error;
-    RecyclerView mMoviesListRecycler;
-    ProgressBar mLoadingIndicator;
-    List<Movies> moviesList;
-    boolean sortedByPopular=false;
-    RecyclerView.LayoutManager layoutManager;
-    int lastFirstVisiblePosition=-1;
-    String movieDetailsJSON;
+    private TextView error;
+    private RecyclerView mMoviesListRecycler;
+    private ProgressBar mLoadingIndicator;
+    private List<Movies> moviesList;
+    private boolean sortedByPopular=true;
+    private RecyclerView.LayoutManager layoutManager;
+    private String movieDetailsJSON;
+    private Spinner spinner;
+    private boolean firstLoad=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mMoviesListRecycler=(RecyclerView)findViewById(R.id.rv_movies_list);
-        mLoadingIndicator=(ProgressBar)findViewById(R.id.progressBar);
+        mMoviesListRecycler=findViewById(R.id.rv_movies_list);
+        mLoadingIndicator=findViewById(R.id.progressBar);
         error=findViewById(R.id.tv_error_message);
         moviesList=new ArrayList<>();
-
         if(savedInstanceState!=null) {
             boolean sortOrder=savedInstanceState.getBoolean("sortedBy");
             if(sortOrder){
+                sortedByPopular=true;
                 loadMoviesThumnail("popular");
             }
             else {
+                sortedByPopular=false;
                 loadMoviesThumnail("top_rated");
             }
         }
@@ -72,24 +73,18 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("sortedBy",sortedByPopular);
-        Log.i("SORT","BY onsave"+sortedByPopular);
 
     }
 
     private void loadMoviesThumnail(String sortBy) {
 
-        if(sortBy.equals("popular")){
-            sortedByPopular=true;
-        }
-        else {
-            sortedByPopular=false;
-        }
         if(isOnline()) {
+            error.setVisibility(View.INVISIBLE);
             MovieDataLoadTask movieDataLoadTask = new MovieDataLoadTask();
             movieDataLoadTask.execute(sortBy);
         }
         else {
-            error.setText("No Internet Connection, Try again");
+            error.setText(getResources().getString(R.string.internet_error));
             error.setVisibility(View.VISIBLE);
         }
     }
@@ -97,54 +92,55 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sort_menu, menu);
-        if (!isOnline()) {
-            disableMenu(menu);
-        }
-        else {
-            enableMenu(menu);
-        }
-        return super.onCreateOptionsMenu(menu);
+
+        MenuItem item = menu.findItem(R.id.spinner);
+        spinner = (Spinner) item.getActionView();
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.spinner_list_item_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+
+                if(firstLoad) {
+                    firstLoad=false;
+                }
+                else{
+                    spinnerSelected();
+                }
+            }
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        return true;
     }
 
-    private void enableMenu(Menu menu) {
-        menu.getItem(0).setEnabled(true);
-        menu.getItem(1).setEnabled(true);
+
+
+
+    private void spinnerSelected(){
+        String item=spinner.getSelectedItem().toString();
+        String popular=getResources().getStringArray(R.array.spinner_list_item_array)[0];
+        String top=getResources().getStringArray(R.array.spinner_list_item_array)[1];
+        if(item.equals(popular)) {
+               sortedByPopular=true;
+               loadMoviesThumnail("popular");
+       }
+       else if(item.equals(top)) {
+
+        sortedByPopular = false;
+        loadMoviesThumnail("top_rated");
+
+       }
+
+
+
     }
-
-    private void disableMenu(Menu menu) {
-        menu.getItem(0).setEnabled(false);
-        menu.getItem(1).setEnabled(false);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int selectedId=item.getItemId();
-        switch (selectedId) {
-            case R.id.sort_popular:
-                if(sortedByPopular){
-                    Toast.makeText(this,"Already sorted by Popularity!",Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                else {
-                    loadMoviesThumnail("popular");
-                }
-                break;
-            case R.id.sort_top :
-                if(sortedByPopular){
-                    loadMoviesThumnail("top_rated");
-                }
-                else {
-                    Toast.makeText(this,"Already sorted by Top rated!",Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                break;
-
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    public boolean isOnline() {
+    private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         assert cm != null;
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -191,13 +187,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             movieDetailsJSON=movieJSON;
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             moviesList = ParseUtility.getMoviesList(movieJSON);
-            layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+            layoutManager = new GridLayoutManager(getApplicationContext(), 2);
             mMoviesListRecycler.setHasFixedSize(true);
             mMoviesListRecycler.setLayoutManager(layoutManager);
             MoviesAdapter adapter = new MoviesAdapter(getApplicationContext(), moviesList,MainActivity.this);
             RecyclerView.ItemAnimator itemAnimator=new DefaultItemAnimator();
             mMoviesListRecycler.setItemAnimator(itemAnimator);
             mMoviesListRecycler.setAdapter(adapter);
+
         }
     }
 
@@ -208,7 +205,5 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         Intent detailsActivity=new Intent(this,MovieDetailsActivity.class);
         detailsActivity.putExtra("movie",movieDetails);
         startActivity(detailsActivity);
-      //  Log.i("TEXT",movieDetails.getOverview());
-
     }
 }

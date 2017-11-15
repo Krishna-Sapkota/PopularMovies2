@@ -25,12 +25,7 @@ public class ParseUtility {
     public static final String POSTER_KEY="poster_path";
     public static final String MOVIE_ARRAY="results";
 
-    public static URL getPosterURL(String movieJSON){
-          return null;
-    }
-    public static String getMovieId(String movieJSON){
-          return null;
-    }
+
     public static List<Movies> getMoviesList(String movieJSON)  {
         List<Movies> moviesList=new ArrayList<>();
         JSONObject movies=null;
@@ -41,11 +36,13 @@ public class ParseUtility {
         }
         JSONArray results=null;
         try {
+            assert movies != null;
             results = movies.getJSONArray(MOVIE_ARRAY);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         int current=0;
+        assert results != null;
         while(current<results.length()){
 
             JSONObject movieRoot=null;
@@ -56,6 +53,7 @@ public class ParseUtility {
             }
             String mid= null;
             try {
+                assert movieRoot != null;
                 mid = movieRoot.getString(MOVIE_ID_KEY);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -87,12 +85,14 @@ public class ParseUtility {
         }
         JSONArray results=null;
         try {
+            assert movies != null;
             results = movies.getJSONArray(MOVIE_ARRAY);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         int current=0;
         MovieDetails  movieDetails=null;
+        assert results != null;
         while(current<results.length()){
 
             JSONObject movieRoot=null;
@@ -103,10 +103,12 @@ public class ParseUtility {
             }
             String mid= null;
             try {
+                assert movieRoot != null;
                 mid = movieRoot.getString(MOVIE_ID_KEY);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            assert mid != null;
             if(mid.equals(movieId)){
 
                 String title=null;

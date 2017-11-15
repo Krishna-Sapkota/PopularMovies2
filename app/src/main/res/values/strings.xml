@@ -1,8 +1,14 @@
 <resources>
     <string name="app_name">PopularMovies</string>
     <string name="poster_name">movie..</string>
-    <string name="top_text">Sort-Top rated</string>
-    <string name="popular_text">Sort-Popular</string>
     <string name="release_text">Released On:</string>
     <string name="rating_text">Rating:</string>
+    <string name="spinner_name">sort_chooser</string>
+    <string name="movie_poster">movie poster</string>
+    <string name="internet_error">Not connected to Internet, try again.</string>
+    <string name="full_rating">10</string>
+    <string-array name="spinner_list_item_array">
+        <item name="popular">Popular</item>
+        <item name="top">Top Rated</item>
+    </string-array>
 </resources>
