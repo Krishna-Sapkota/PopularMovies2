@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -212,12 +213,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         @Override
         protected void onPostExecute(String movieJSON) {
             super.onPostExecute(movieJSON);
-            final short layoutGrid=2;
             movieDetailsJSON=movieJSON;
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             moviesList = ParseUtility.getMoviesList(movieJSON);
             RecyclerView.LayoutManager layoutManager;
-            layoutManager = new GridLayoutManager(getApplicationContext(),layoutGrid);
+            layoutManager = new GridLayoutManager(getApplicationContext(),numberOfColumns());
             mMoviesListRecycler.setHasFixedSize(true);
             mMoviesListRecycler.setLayoutManager(layoutManager);
             MoviesAdapter adapter = new MoviesAdapter(getApplicationContext(), moviesList,MainActivity.this);
@@ -232,5 +232,15 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         Intent detailsActivity=new Intent(this,MovieDetailsActivity.class);
         detailsActivity.putExtra(PARCEABLE_KEY,movieDetails);
         startActivity(detailsActivity);
+    }
+    private int numberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        // You can change this divider to adjust the size of the poster
+        int widthDivider = 400;
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if (nColumns < 2) return 2;
+        return nColumns;
     }
 }
