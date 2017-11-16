@@ -41,15 +41,20 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private boolean firstLoad=true;
 
 
+
+
     private final static String PARCEABLE_KEY="movie";
     private final String POPULAR_PATH="popular";
     private final String HIGHEST_RATED_PATH="top_rated";
     private final String SORTED_KEY="sortedBy";
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mMoviesListRecycler=findViewById(R.id.rv_movies_list);
         mLoadingIndicator=findViewById(R.id.progressBar);
         error=findViewById(R.id.tv_error_message);
@@ -71,8 +76,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     }
 
-    /*
-    save the sort order to display same sorting when screen rotates
+    /**
+     * save the sort order to display same sorting when screen rotates
+
+     * @param outState
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -98,6 +105,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         }
     }
 
+    /**
+     * Creating spinner on toolbar from
+     * https://stackoverflow.com/questions/37250397/how-to-add-a-spinner-next-to-a-menu-in-the-toolbar
+     *
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sort_menu, menu);
@@ -149,6 +163,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
 
     }
+
+    /**
+     checking online code used from
+     https://www.google.com/url?q=http://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-timeouts&sa=D&ust=1510813688269000&usg=AFQjCNF0VNbteS1wdDxpwk5kwL7t-zQlyA
+     **/
+
     private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         assert cm != null;

@@ -2,6 +2,8 @@ package com.project.krishna.popularmovies.utils;
 
 import android.net.Uri;
 
+import com.project.krishna.popularmovies.MainActivity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -14,7 +16,7 @@ import java.util.Scanner;
  */
 
 public final class NetworkUtility {
-    private static final String MOVIE_DB_SCHEME="https";
+    private static final String MOVIE_DB_SCHEME= "https";
 
     private static final String MOVIE_DB_BASE_URL="api.themoviedb.org";
     private static final String MOVIE_DB_BASE_PATH="3/movie";

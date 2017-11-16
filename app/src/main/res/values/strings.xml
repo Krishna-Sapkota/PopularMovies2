@@ -11,4 +11,12 @@
         <item name="popular">Popular</item>
         <item name="top">Top Rated</item>
     </string-array>
+    <string name="api_key">e258b44703031d92257a4a7eb9907108</string>
+    <string name="movie_db_authority">api.themoviedb.org</string>
+    <string name="movie_base_path">3/movie</string>
+    <string name="tmdb_scheme">https</string>
+    <string name="param_api_key">api_key</string>
+    <string name="poster_authority">image.tmdb.org</string>
+    <string name="poster_path">/t/p/w185/</string>
+
 </resources>

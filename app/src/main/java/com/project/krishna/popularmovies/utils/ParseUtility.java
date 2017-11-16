@@ -1,6 +1,8 @@
 package com.project.krishna.popularmovies.utils;
 
+import android.graphics.Movie;
 import android.net.Uri;
+import android.util.Log;
 
 import com.project.krishna.popularmovies.datamodel.MovieDetails;
 import com.project.krishna.popularmovies.datamodel.Movies;
@@ -9,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,7 +112,8 @@ public class ParseUtility {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            assert mid != null;
+
+
             if(mid.equals(movieId)){
 
                 String title=null;
@@ -116,9 +121,8 @@ public class ParseUtility {
                 String releaseDate=null;
                 String backdrop=null;
                 String rating=null;
+
                 try {
-
-
                     title = movieRoot.getString(MOVIE_TITLE_KEY);
                     overview = movieRoot.getString(MOVIE_OVERVIEW_KEY);
                     releaseDate = movieRoot.getString(MOVIE_RELEASE_KEY);
