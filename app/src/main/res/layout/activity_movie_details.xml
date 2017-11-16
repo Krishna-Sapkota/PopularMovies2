@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/scroller_margin"
+    android:fillViewport="false"
+    >
+    />
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,10 +17,10 @@
 
     <ImageView
         android:id="@+id/iv_movie"
-        android:layout_width="183dp"
-        android:layout_height="135dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="@dimen/detail_poster_width"
+        android:layout_height="@dimen/detail_poster_height"
+        android:layout_marginStart="@dimen/detail_marginStart"
+        android:layout_marginTop="@dimen/detail_marginTop"
         android:contentDescription="@string/movie_poster"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,9 +30,9 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:textSize="24sp"
+        android:layout_marginStart="@dimen/detail_marginStart"
+        android:layout_marginTop="@dimen/detail_marginTop"
+        android:textSize="@dimen/detail_title_size"
         android:textColor="@color/colorPrimaryDark"
         android:fontFamily="serif-monospace"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,9 +42,9 @@
         android:id="@+id/tv_overview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/detail_text_marginEnd"
+        android:layout_marginStart="@dimen/detail_text_marginStart"
+        android:layout_marginTop="@dimen/detail_text_marginTop"
         android:fontFamily="serif"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,9 +56,9 @@
         android:id="@+id/tv_release"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/detail_text_marginEnd"
+        android:layout_marginStart="@dimen/detail_text_marginStart"
+        android:layout_marginTop="@dimen/detail_marginTop"
         android:textColor="@color/colorPrimary"
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,9 +68,9 @@
     <TextView
         android:id="@+id/release_label"
         android:layout_width="wrap_content"
-        android:layout_height="16dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/detail_text_marginStart"
+        android:layout_marginTop="@dimen/detail_text_marginTop"
         android:text="@string/release_text"
         app:layout_constraintStart_toEndOf="@+id/iv_movie"
         app:layout_constraintTop_toTopOf="@+id/iv_movie" />
@@ -71,7 +79,7 @@
         android:id="@+id/rating_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/detail_text_marginTop"
         android:text="@string/rating_text"
         app:layout_constraintStart_toStartOf="@+id/release_label"
         app:layout_constraintTop_toBottomOf="@+id/tv_release" />
@@ -80,8 +88,9 @@
         android:id="@+id/tv_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/detail_marginTop"
         android:textColor="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="@+id/tv_release"
         app:layout_constraintTop_toBottomOf="@+id/rating_label" />
 </android.support.constraint.ConstraintLayout>
+</ScrollView>

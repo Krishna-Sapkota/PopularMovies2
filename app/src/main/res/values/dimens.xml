@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="scroller_margin">10dp</dimen>
+    <dimen name="detail_poster_width">183dp</dimen>
+    <dimen name="detail_poster_height">135dp</dimen>
+    <dimen name="detail_marginStart">16dp</dimen>
+    <dimen name="detail_marginTop">8dp</dimen>
+    <dimen name="detail_title_size">24sp</dimen>
+    <dimen name="detail_text_marginEnd">8dp</dimen>
+    <dimen name="detail_text_marginTop">16dp</dimen>
+    <dimen name="detail_text_marginStart">8dp</dimen>
+    <dimen name="detail_text_horizontalBias">0.06</dimen>
+
+</resources>
