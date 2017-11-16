@@ -32,10 +32,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mOverview=findViewById(R.id.tv_overview);
         mRelease=findViewById(R.id.tv_release);
 
-        MovieDetails movieDetails=getIntent().getExtras().getParcelable("movie");
+        MovieDetails movieDetails=getIntent().getExtras().getParcelable(MainActivity.getParceableKey());
         Uri.Builder builder= NetworkUtility.getPosterBase();
         builder.appendEncodedPath(movieDetails.getThumbnailURL());
-        builder.appendQueryParameter(NetworkUtility.PARAM_API_KEY,NetworkUtility.API_KEY);
+        builder.appendQueryParameter(NetworkUtility.getParamApiKey(),NetworkUtility.getApiKey());
         Uri thumbnailUri=builder.build();
         URL url=null;
         try {
@@ -47,14 +47,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 .load(url.toString())
                 .placeholder(android.R.drawable.progress_indeterminate_horizontal)
                 .into(mMovieThumbnail);
-         //.apply(RequestOptions.bitmapTransform(new CircleCrop()))
 
         mTitle.setText(movieDetails.getTitle());
         mOverview.setText(movieDetails.getOverview());
         mRelease.setText(movieDetails.getReleaseDate());
-        String rating=new String(movieDetails.getRating());
+        String rating=movieDetails.getRating();
         rating.concat(mRatingFull);
-        mRating.setText(rating.toString());
+        mRating.setText(rating);
 
     }
 }

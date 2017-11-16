@@ -13,17 +13,27 @@ import java.util.Scanner;
  * Created by Krishna on 11/13/17.
  */
 
-public class NetworkUtility {
-    public static final String MOVIE_DB_SCHEME="https";
+public final class NetworkUtility {
+    private static final String MOVIE_DB_SCHEME="https";
 
-    public static final String MOVIE_DB_BASE_URL="api.themoviedb.org";
-    public static final String MOVIE_DB_BASE_PATH="3/movie";
-    public static final String API_KEY="ENTER API KEY HERE";
+    private static final String MOVIE_DB_BASE_URL="api.themoviedb.org";
+    private static final String MOVIE_DB_BASE_PATH="3/movie";
 
-    public static final String PARAM_API_KEY="api_key";
 
-    public static final String POSTER_BASE_URL="image.tmdb.org";
-    public static final String POSTER_BASE_PATH="/t/p/w185/";
+    private static final String API_KEY="e258b44703031d92257a4a7eb9907108";
+
+
+    private static final String PARAM_API_KEY="api_key";
+
+    private static final String POSTER_BASE_URL="image.tmdb.org";
+    private static final String POSTER_BASE_PATH="/t/p/w185/";
+
+    public static String getApiKey() {
+        return API_KEY;
+    }
+    public static String getParamApiKey() {
+        return PARAM_API_KEY;
+    }
 
 
 

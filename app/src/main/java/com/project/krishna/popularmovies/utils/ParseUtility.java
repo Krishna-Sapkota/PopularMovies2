@@ -1,8 +1,6 @@
 package com.project.krishna.popularmovies.utils;
 
-import android.graphics.Movie;
 import android.net.Uri;
-import android.util.Log;
 
 import com.project.krishna.popularmovies.datamodel.MovieDetails;
 import com.project.krishna.popularmovies.datamodel.Movies;
@@ -11,8 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +17,14 @@ import java.util.List;
  */
 
 public class ParseUtility {
-    public static final String MOVIE_ID_KEY="id";
-    public static final String POSTER_KEY="poster_path";
-    public static final String MOVIE_ARRAY="results";
-
+    private static final String MOVIE_ID_KEY="id";
+    private static final String POSTER_KEY="poster_path";
+    private static final String MOVIE_ARRAY="results";
+    private static final String MOVIE_TITLE_KEY="original_title";
+    private static final String MOVIE_OVERVIEW_KEY="overview";
+    private static final String MOVIE_RELEASE_KEY="release_date";
+    private static final String MOVIE_BACKDROP_KEY="backdrop_path";
+    private static final String MOVIE_RATING_KEY="vote_average";
 
     public static List<Movies> getMoviesList(String movieJSON)  {
         List<Movies> moviesList=new ArrayList<>();
@@ -119,11 +119,11 @@ public class ParseUtility {
                 try {
 
 
-                    title = movieRoot.getString("original_title");
-                    overview = movieRoot.getString("overview");
-                    releaseDate = movieRoot.getString("release_date");
-                    backdrop = movieRoot.getString("backdrop_path");
-                    rating=movieRoot.getString("vote_average");
+                    title = movieRoot.getString(MOVIE_TITLE_KEY);
+                    overview = movieRoot.getString(MOVIE_OVERVIEW_KEY);
+                    releaseDate = movieRoot.getString(MOVIE_RELEASE_KEY);
+                    backdrop = movieRoot.getString(MOVIE_BACKDROP_KEY);
+                    rating=movieRoot.getString(MOVIE_RATING_KEY);
                 }
                 catch (JSONException e){
                     e.printStackTrace();

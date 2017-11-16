@@ -7,7 +7,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -37,10 +36,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private ProgressBar mLoadingIndicator;
     private List<Movies> moviesList;
     private boolean sortedByPopular=true;
-    private RecyclerView.LayoutManager layoutManager;
     private String movieDetailsJSON;
     private Spinner spinner;
     private boolean firstLoad=true;
+
+
+    private final static String PARCEABLE_KEY="movie";
+    private final String POPULAR_PATH="popular";
+    private final String HIGHEST_RATED_PATH="top_rated";
+    private final String SORTED_KEY="sortedBy";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,18 +55,18 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         error=findViewById(R.id.tv_error_message);
         moviesList=new ArrayList<>();
         if(savedInstanceState!=null) {
-            boolean sortOrder=savedInstanceState.getBoolean("sortedBy");
+            boolean sortOrder=savedInstanceState.getBoolean(SORTED_KEY);
             if(sortOrder){
                 sortedByPopular=true;
-                loadMoviesThumnail("popular");
+                loadMoviesThumnail(POPULAR_PATH);
             }
             else {
                 sortedByPopular=false;
-                loadMoviesThumnail("top_rated");
+                loadMoviesThumnail(HIGHEST_RATED_PATH);
             }
         }
         else {
-            loadMoviesThumnail("popular");
+            loadMoviesThumnail(POPULAR_PATH);
         }
 
     }
@@ -72,9 +77,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("sortedBy",sortedByPopular);
+        outState.putBoolean(SORTED_KEY,sortedByPopular);
 
     }
+    public static String getParceableKey() {
+        return PARCEABLE_KEY;
+    }
+
 
     private void loadMoviesThumnail(String sortBy) {
 
@@ -128,12 +137,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         String top=getResources().getStringArray(R.array.spinner_list_item_array)[1];
         if(item.equals(popular)) {
                sortedByPopular=true;
-               loadMoviesThumnail("popular");
+               loadMoviesThumnail(POPULAR_PATH);
        }
        else if(item.equals(top)) {
 
         sortedByPopular = false;
-        loadMoviesThumnail("top_rated");
+        loadMoviesThumnail(HIGHEST_RATED_PATH);
 
        }
 
@@ -158,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         protected void onPreExecute() {
             super.onPreExecute();
             mLoadingIndicator.setVisibility(View.VISIBLE);
-
         }
 
         @Override
@@ -184,17 +192,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         @Override
         protected void onPostExecute(String movieJSON) {
             super.onPostExecute(movieJSON);
+            final short layoutGrid=2;
             movieDetailsJSON=movieJSON;
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             moviesList = ParseUtility.getMoviesList(movieJSON);
-            layoutManager = new GridLayoutManager(getApplicationContext(), 2);
+            RecyclerView.LayoutManager layoutManager;
+            layoutManager = new GridLayoutManager(getApplicationContext(),layoutGrid);
             mMoviesListRecycler.setHasFixedSize(true);
             mMoviesListRecycler.setLayoutManager(layoutManager);
             MoviesAdapter adapter = new MoviesAdapter(getApplicationContext(), moviesList,MainActivity.this);
-            RecyclerView.ItemAnimator itemAnimator=new DefaultItemAnimator();
-            mMoviesListRecycler.setItemAnimator(itemAnimator);
             mMoviesListRecycler.setAdapter(adapter);
-
         }
     }
 
@@ -203,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         String clickedMovie=moviesList.get(clickedIndex).getMovieId();
         MovieDetails movieDetails=ParseUtility.getMovieDetails(movieDetailsJSON,clickedMovie);
         Intent detailsActivity=new Intent(this,MovieDetailsActivity.class);
-        detailsActivity.putExtra("movie",movieDetails);
+        detailsActivity.putExtra(PARCEABLE_KEY,movieDetails);
         startActivity(detailsActivity);
     }
 }

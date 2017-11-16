@@ -17,8 +17,8 @@ import java.util.List;
  */
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PosterViewHolder> {
-    private List<Movies> moviesList;
-    private Context context;
+    private final List<Movies> moviesList;
+    private final Context context;
     final private MovieThumbnailClickListener mOnClickListener;
 
     public interface MovieThumbnailClickListener{
