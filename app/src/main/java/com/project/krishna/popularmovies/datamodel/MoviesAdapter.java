@@ -17,9 +17,14 @@ import java.util.List;
  */
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PosterViewHolder> {
-    private final List<Movies> moviesList;
+    private List<Movies> moviesList;
     private final Context context;
     final private MovieThumbnailClickListener mOnClickListener;
+
+    public void setMovieData(List<Movies> movieData) {
+        this.moviesList = movieData;
+        notifyDataSetChanged();
+    }
 
     public interface MovieThumbnailClickListener{
          void onThumnailClick(int clickedIndex);
@@ -52,7 +57,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PosterView
 
     @Override
     public int getItemCount() {
+        if(moviesList!=null)
         return moviesList.size();
+        else return  0;
+
     }
 
 
