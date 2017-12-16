@@ -2,6 +2,7 @@ package com.project.krishna.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.LoaderManager;
@@ -9,6 +10,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -33,8 +35,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieThumbnailClickListener, LoaderManager.LoaderCallbacks<List<Movies>> {
-    private static final String SORT_POPULAR ="popular" ;
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.MovieThumbnailClickListener, LoaderManager.LoaderCallbacks<List<Movies>>,SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final String SORT_POPULAR ="Popular";
+    private static final String SORT_TOP="Top Rated";
+    private static final String SORT_FAVOURITE="Favourite";
     private static final int MOVIE_THUMBNAIL_LOADER =10 ;
     private TextView error;
     private RecyclerView mMoviesListRecycler;
@@ -44,19 +48,15 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private String movieDetailsJSON;
     private Spinner spinner;
     private boolean firstLoad=true;
-    private boolean movieLoaded=false;
-
-
-
-
+    private Bundle sort;
 
     private final static String PARCEABLE_KEY="movie";
     private final String POPULAR_PATH="popular";
     private final String HIGHEST_RATED_PATH="top_rated";
     private final String SORTED_KEY="sortedBy";
-    private Bundle savedInstance;
     private MoviesAdapter adapter;
-
+    private static String movieJSON;
+    private boolean preferenceChanged=false;
 
 
     @Override
@@ -74,17 +74,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         LoaderManager loaderManager=getSupportLoaderManager();
         Loader<List<Movies>> loader=loaderManager.getLoader(MOVIE_THUMBNAIL_LOADER);
-        Log.i("TEST","OnCreate");
-       /* if(loader==null) {
-            Log.i("TEST","Loader is null");
-           loaderManager.initLoader(MOVIE_THUMBNAIL_LOADER, null, this);
-        }
-        else {
-            Log.i("TEST","Loader is not null");
+        sort=new Bundle();
+        SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
+        String sortBy=sharedPreferences.getString(getString(R.string.sort_key),getString(R.string.default_sort));
+        sort.putString(SORTED_KEY,sortBy);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-            loaderManager.restartLoader(MOVIE_THUMBNAIL_LOADER,null,this);
-        }*/
-       loaderManager.initLoader(MOVIE_THUMBNAIL_LOADER,null,this);
+
+
+        loaderManager.initLoader(MOVIE_THUMBNAIL_LOADER,sort,this);
+
 
 
 
@@ -131,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sort_menu, menu);
+        getMenuInflater().inflate(R.menu.settings_overflow,menu);
 
         MenuItem item = menu.findItem(R.id.spinner);
         spinner = (Spinner) item.getActionView();
@@ -155,24 +155,37 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
             }
         });
+        String sortBy=PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.sort_key),getString(R.string.default_sort));
+        setSpinnerSelection(sortBy);
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id=item.getItemId();
 
+        if(id==R.id.settings){
+            Intent settingsActivity=new Intent(this,PreferenceActivity.class);
+            startActivity(settingsActivity);
+        }
 
+        return super.onOptionsItemSelected(item);
+    }
 
     private void spinnerSelected(){
         String item=spinner.getSelectedItem().toString();
         String popular=getResources().getStringArray(R.array.spinner_list_item_array)[0];
         String top=getResources().getStringArray(R.array.spinner_list_item_array)[1];
         if(item.equals(popular)) {
-               sortedByPopular=true;
-             //  loadMoviesThumnail(POPULAR_PATH);
+            sortedByPopular=true;
+            sort.putString(SORTED_KEY,SORT_POPULAR);
+            getSupportLoaderManager().restartLoader(MOVIE_THUMBNAIL_LOADER,sort,this);
        }
        else if(item.equals(top)) {
 
-        sortedByPopular = false;
-        //loadMoviesThumnail(HIGHEST_RATED_PATH);
+            sortedByPopular = false;
+            sort.putString(SORTED_KEY,SORT_TOP);
+            getSupportLoaderManager().restartLoader(MOVIE_THUMBNAIL_LOADER,sort,this);
 
        }
 
@@ -243,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public void onThumnailClick(int clickedIndex) {
         String clickedMovie=movies.get(clickedIndex).getMovieId();
-        MovieDetails movieDetails=ParseUtility.getMovieDetails(movieDetailsJSON,clickedMovie);
+        MovieDetails movieDetails=ParseUtility.getMovieDetails(movieJSON,clickedMovie);
         Intent detailsActivity=new Intent(this,MovieDetailsActivity.class);
         detailsActivity.putExtra(PARCEABLE_KEY,movieDetails);
         startActivity(detailsActivity);
@@ -260,9 +273,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     }
 
     @Override
-    public Loader<List<Movies>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<Movies>> onCreateLoader(int id, final Bundle args) {
 
-        final String sort="popular";
         switch (id){
             case MOVIE_THUMBNAIL_LOADER:
                 return new AsyncTaskLoader<List<Movies>>(this) {
@@ -273,20 +285,28 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                         super.onStartLoading();
                         if(moviesList!=null){
                             deliverResult(moviesList);
-                            Log.i("TEST","movie list contains data");
                         }
                         else{
                             mLoadingIndicator.setVisibility(View.VISIBLE);
                             forceLoad();
-                            Log.i("TEST","movie list does not contains data");
-
                         }
                     }
 
                     @Override
                     public List<Movies> loadInBackground() {
                         URL movieDBURL=null;
-                        String movieJSON=null;
+                        movieJSON=null;
+                        String sort=null;
+                        String sortOrder=args.getString(SORTED_KEY);
+                        Log.i("TEST",sortOrder);
+                        if(sortOrder.equals(SORT_POPULAR)){
+                            sort=POPULAR_PATH;
+                        } else if(sortOrder.equals(SORT_TOP)){
+                            sort=HIGHEST_RATED_PATH;
+                        }
+                        else {
+                            sort=POPULAR_PATH;
+                        }
 
                         try {
                             movieDBURL= NetworkUtility.buildURL(sort);
@@ -333,4 +353,30 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     }
 
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        String sortBy=sharedPreferences.getString(getString(R.string.sort_key),getString(R.string.default_sort));
+        sort.putString(SORTED_KEY,sortBy);
+        setSpinnerSelection(sortBy);
+        getSupportLoaderManager().restartLoader(MOVIE_THUMBNAIL_LOADER,sort,this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    public void setSpinnerSelection(String sortBy){
+        int selected=0;
+        String[] selectionList=getResources().getStringArray(R.array.spinner_list_item_array);
+        for(int i=0;i<selectionList.length;i++) {
+            if (sortBy.equals(selectionList[i])) {
+                selected = i;
+            }
+        }
+        spinner.setSelection(selected);
+
+    }
 }

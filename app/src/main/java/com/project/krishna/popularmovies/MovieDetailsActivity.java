@@ -1,8 +1,11 @@
 package com.project.krishna.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -56,4 +59,22 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mRating.setText(rating);
 
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            onBackPressed();
+        }
+        if(item.getItemId()==R.id.settings){
+            Intent settingsActivity=new Intent(this,PreferenceActivity.class);
+            startActivity(settingsActivity);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.settings_overflow,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
 }
