@@ -1,8 +1,10 @@
 package com.project.krishna.popularmovies;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -12,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,8 +23,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.project.krishna.popularmovies.datamodel.FavouriteContract;
 import com.project.krishna.popularmovies.datamodel.MovieDetails;
 import com.project.krishna.popularmovies.datamodel.Review;
 import com.project.krishna.popularmovies.datamodel.Trailers;
@@ -47,6 +52,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private TextView mRating;
     private String mRatingFull;
     private RecyclerView recyclerViewReview;
+    boolean isFavouriteEnable=false;
+
 
     ListView trailerList;
     @Override
@@ -66,7 +73,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerViewReview.setNestedScrollingEnabled(false);
         recyclerViewReview.setLayoutManager(layoutManager);
-        MovieDetails movieDetails=getIntent().getExtras().getParcelable(MainActivity.getParceableKey());
+        final MovieDetails movieDetails=getIntent().getExtras().getParcelable(MainActivity.getParceableKey());
         movieId=movieDetails.getId();
         Uri.Builder builder= NetworkUtility.getPosterBase();
 
@@ -91,16 +98,42 @@ public class MovieDetailsActivity extends AppCompatActivity {
         rating.concat(mRatingFull);
         mRating.setText(rating);
         final ImageButton favouriteButton = (ImageButton) findViewById(R.id.favourite_button);
+        Cursor cursor=getContentResolver().query(FavouriteContract.FavouriteEntry.CONTENT_URI.
+                        buildUpon().appendPath(movieDetails.getId()).build(),
+                null,
+                null,
+                null,
+                null
+        );
+        if(cursor.getCount()!=0){
+            setFavouriteSelected(favouriteButton);
+        }
+        else {
+            setFavouriteDisabled(favouriteButton);
+        }
+
         favouriteButton.setOnClickListener(new View.OnClickListener() {
-             boolean isEnable=false;
             @Override
             public void onClick(View view) {
-                if (isEnable){
-                    favouriteButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),android.R.drawable.btn_star_big_off));
+                if (isFavouriteEnable){
+                    setFavouriteDisabled(favouriteButton);
+                    String selection= FavouriteContract.FavouriteEntry.COLUMN_MOVIE_ID;
+                    String[] args={movieDetails.getId()};
+                    getContentResolver().delete(FavouriteContract.FavouriteEntry.CONTENT_URI.
+                                    buildUpon().appendPath(movieDetails.getId()).build(),
+                                    null,null);
+                    Toast.makeText(MovieDetailsActivity.this,"Removed from favourite collection",Toast.LENGTH_SHORT).show();
                 }else{
-                    favouriteButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),android.R.drawable.btn_star_big_on));
+                    setFavouriteSelected(favouriteButton);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(FavouriteContract.FavouriteEntry.COLUMN_MOVIE_ID,movieDetails.getId());
+                    contentValues.put(FavouriteContract.FavouriteEntry.COLUMN_MOVIE_TITLE,movieDetails.getTitle());
+                    Log.i("TESTID",movieDetails.getId());
+                    getContentResolver().insert(FavouriteContract.FavouriteEntry.CONTENT_URI,contentValues);
+                    Toast.makeText(MovieDetailsActivity.this,"Added to favourite collection",Toast.LENGTH_SHORT).show();
+
                 }
-                isEnable = !isEnable;
+                isFavouriteEnable = !isFavouriteEnable;
             }
         });
         getSupportLoaderManager().initLoader(TRAILER_LOADER,null,new TrailerLoader());
@@ -136,6 +169,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+    private void setFavouriteSelected(ImageButton favouriteButton){
+        favouriteButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),android.R.drawable.btn_star_big_on));
+        isFavouriteEnable=true;
+    }
+    private void setFavouriteDisabled(ImageButton favouriteButton){
+        favouriteButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),android.R.drawable.btn_star_big_off));
+        isFavouriteEnable=false;
     }
 
 

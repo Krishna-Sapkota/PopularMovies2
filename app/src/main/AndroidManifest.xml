@@ -26,6 +26,10 @@
         <activity android:name=".PreferenceActivity"
             android:label="@string/settings"
             android:parentActivityName=".MainActivity"></activity>
+        <provider
+            android:authorities="com.project.krishna.popularmovies"
+            android:name=".datamodel.FavouriteProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
