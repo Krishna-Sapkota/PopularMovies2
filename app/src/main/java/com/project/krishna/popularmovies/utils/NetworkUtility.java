@@ -74,6 +74,15 @@ public final class NetworkUtility {
 
     }
 
+    public static Uri.Builder getBaseURI(){
+        Uri.Builder builder=new Uri.Builder();
+
+        builder.scheme(MOVIE_DB_SCHEME);
+        builder.authority(MOVIE_DB_BASE_URL);
+        builder.appendEncodedPath(MOVIE_DB_BASE_PATH);
+        return builder;
+    }
+
     public static Uri.Builder getPosterBase(){
         Uri.Builder builder=new Uri.Builder();
         builder.scheme(MOVIE_DB_SCHEME);
