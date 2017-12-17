@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -11,7 +13,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="com.project.krishna.popularmovies.MovieDetailsActivity"
     tools:layout_editor_absoluteY="81dp">
 
@@ -20,6 +22,7 @@
         android:layout_width="@dimen/detail_poster_width"
         android:layout_height="@dimen/detail_poster_height"
         android:layout_marginStart="@dimen/detail_marginStart"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="@dimen/detail_marginTop"
         android:contentDescription="@string/movie_poster"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -43,7 +46,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/detail_text_marginEnd"
+        android:layout_marginRight="@dimen/margin_right_overview"
         android:layout_marginStart="@dimen/detail_text_marginStart"
+        android:layout_marginLeft="@dimen/margin_right_overview"
         android:layout_marginTop="@dimen/detail_text_marginTop"
         android:fontFamily="serif"
         android:textColor="@color/colorAccent"
@@ -112,5 +117,18 @@
 
         </android.support.v7.widget.RecyclerView>
     </android.support.constraint.ConstraintLayout>
+
+    <ImageButton
+        android:id="@+id/favourite_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="104dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.267"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_movie"
+        android:src="@drawable/favourite_selector" />
 </android.support.constraint.ConstraintLayout>
 </ScrollView>

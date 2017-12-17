@@ -1,9 +1,12 @@
 package com.project.krishna.popularmovies;
 
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +14,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -58,6 +64,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerViewReview.setNestedScrollingEnabled(false);
         recyclerViewReview.setLayoutManager(layoutManager);
         MovieDetails movieDetails=getIntent().getExtras().getParcelable(MainActivity.getParceableKey());
         movieId=movieDetails.getId();
@@ -83,6 +90,19 @@ public class MovieDetailsActivity extends AppCompatActivity {
         String rating=movieDetails.getRating();
         rating.concat(mRatingFull);
         mRating.setText(rating);
+        final ImageButton favouriteButton = (ImageButton) findViewById(R.id.favourite_button);
+        favouriteButton.setOnClickListener(new View.OnClickListener() {
+             boolean isEnable=false;
+            @Override
+            public void onClick(View view) {
+                if (isEnable){
+                    favouriteButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),android.R.drawable.btn_star_big_off));
+                }else{
+                    favouriteButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),android.R.drawable.btn_star_big_on));
+                }
+                isEnable = !isEnable;
+            }
+        });
         getSupportLoaderManager().initLoader(TRAILER_LOADER,null,new TrailerLoader());
         getSupportLoaderManager().initLoader(REVIEW_LOADER,null,new ReviewLoader());
 
@@ -175,16 +195,37 @@ public class MovieDetailsActivity extends AppCompatActivity {
          }
 
          @Override
-         public void onLoadFinished(Loader<Trailers[]> loader, Trailers[] data) {
+         public void onLoadFinished(Loader<Trailers[]> loader, final Trailers[] data) {
              String[] trailerNames = new String[data.length];
              int[] playIcons = new int[data.length];
+             String[] ids=new String[data.length];
              for (int i = 0; i < data.length; i++) {
+                 ids[i]=data[i].getId();
                  trailerNames[i] = data[i].getName();
                  playIcons[i] = R.drawable.ic_play_circle_filled_black_24dp;
              }
-             TrailerAdapter adapter = new TrailerAdapter(MovieDetailsActivity.this, trailerNames, playIcons);
+             TrailerAdapter adapter = new TrailerAdapter(MovieDetailsActivity.this, ids,trailerNames, playIcons);
              trailerList.setAdapter(adapter);
+             trailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                 @Override
+                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    String trailerId=(String)adapterView.getItemAtPosition(i);
+                    String key=getTrailerURLKey(trailerId,data);
+                    if(key!=null)
+                    watchYoutubeVideo(MovieDetailsActivity.this,key);
 
+                 }
+             });
+
+         }
+
+         private String getTrailerURLKey(String trailerId, Trailers[] data) {
+             for(Trailers trailer:data){
+                 if(trailer.getId().equals(trailerId)){
+                     return  trailer.getYouTubeKey();
+                 }
+             }
+             return null;
          }
 
          @Override
@@ -251,4 +292,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
          }
      }
+    public  void watchYoutubeVideo(Context context, String id){
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + id));
+        try {
+            context.startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            context.startActivity(webIntent);
+        }
+    }
 }

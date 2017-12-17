@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.project.krishna.popularmovies.datamodel.Trailers;
+
 /**
  * Created by Krishna on 12/17/17.
  */
@@ -15,11 +17,13 @@ import android.widget.TextView;
 public class TrailerAdapter extends BaseAdapter{
 
     private Context mContext;
+    String[] ids;
     private String[]  name;
     private int[] icon;
 
-    public TrailerAdapter(Context context, String[] trailerName, int[] imageIds) {
+    public TrailerAdapter(Context context, String[] ids,String[] trailerName, int[] imageIds) {
         mContext = context;
+        this.ids=ids;
         name = trailerName;
         icon = imageIds;
 
@@ -31,8 +35,9 @@ public class TrailerAdapter extends BaseAdapter{
     }
 
     @Override
-    public Object getItem(int i) {
-        return null;
+    public String getItem(int i) {
+        return ids[i];
+
     }
 
 
