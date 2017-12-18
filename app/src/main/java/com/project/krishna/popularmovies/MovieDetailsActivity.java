@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
@@ -56,6 +57,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
 
     ListView trailerList;
+    Trailers[] trailers;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,8 +72,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         recyclerViewReview=findViewById(R.id.rv_reviews);
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerViewReview.setNestedScrollingEnabled(false);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewReview.setLayoutManager(layoutManager);
         final MovieDetails movieDetails=getIntent().getExtras().getParcelable(MainActivity.getParceableKey());
         movieId=movieDetails.getId();
@@ -123,6 +124,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                                     buildUpon().appendPath(movieDetails.getId()).build(),
                                     null,null);
                     Toast.makeText(MovieDetailsActivity.this,"Removed from favourite collection",Toast.LENGTH_SHORT).show();
+                    isFavouriteEnable=false;
                 }else{
                     setFavouriteSelected(favouriteButton);
                     ContentValues contentValues=new ContentValues();
@@ -132,9 +134,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     Log.i("TESTID",movieDetails.getId());
                     getContentResolver().insert(FavouriteContract.FavouriteEntry.CONTENT_URI,contentValues);
                     Toast.makeText(MovieDetailsActivity.this,"Added to favourite collection",Toast.LENGTH_SHORT).show();
+                    isFavouriteEnable=true;
 
                 }
-                isFavouriteEnable = !isFavouriteEnable;
             }
         });
         getSupportLoaderManager().initLoader(TRAILER_LOADER,null,new TrailerLoader());
@@ -150,12 +152,37 @@ public class MovieDetailsActivity extends AppCompatActivity {
             Intent settingsActivity=new Intent(this,PreferenceActivity.class);
             startActivity(settingsActivity);
         }
+        if(item.getItemId()==R.id.share_action){
+            shareTrailer();
+        }
         return true;
+    }
+
+    private void shareTrailer() {
+
+            String mimeType = "text/plain";
+            String title = "Share the trailer";
+            if(trailers!=null) {
+                String URL = "http://www.youtube.com/watch?v=" + trailers[0].getYouTubeKey();
+                Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                        .setChooserTitle(title)
+                        .setType(mimeType)
+                        .setText(URL)
+                        .getIntent();
+                if (shareIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(Intent.createChooser(shareIntent, title));
+                }
+            }
+            else {
+                Toast.makeText(this,"Trailers not loaded",Toast.LENGTH_SHORT).show();
+            }
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.settings_overflow,menu);
+        getMenuInflater().inflate(R.menu.share_button,menu);
         return super.onCreateOptionsMenu(menu);
     }
     private URL buildURL(String path){
@@ -238,6 +265,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
          @Override
          public void onLoadFinished(Loader<Trailers[]> loader, final Trailers[] data) {
+             trailers=data;
              String[] trailerNames = new String[data.length];
              int[] playIcons = new int[data.length];
              String[] ids=new String[data.length];

@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private List<Movies> movies;
     private boolean sortedByPopular=true;
     private boolean sortedByFavourite=false;
-    private String movieDetailsJSON;
+    private boolean sortedByTop=false;
     private Spinner spinner;
     private boolean firstLoad=true;
     private Bundle sort;
@@ -80,8 +80,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
 
 
-        mMoviesListRecycler=findViewById(R.id.rv_movies_list);
-        mLoadingIndicator=findViewById(R.id.progressBar);
+        mMoviesListRecycler=(RecyclerView)findViewById(R.id.rv_movies_list);
+        mLoadingIndicator=(ProgressBar)findViewById(R.id.progressBar);
         error=findViewById(R.id.tv_error_message);
         RecyclerView.LayoutManager layoutManager;
         layoutManager = new GridLayoutManager(this,numberOfColumns());
@@ -211,12 +211,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         if(item.equals(popular)) {
             sortedByPopular=true;
             sortedByFavourite=false;
+            sortedByTop=false;
             sort.putString(SORTED_KEY,SORT_POPULAR);
             getSupportLoaderManager().restartLoader(MOVIE_THUMBNAIL_LOADER,sort,this);
        }
        else if(item.equals(top)) {
 
-            sortedByPopular = false;
+            sortedByTop = true;
+            sortedByPopular=false;
             sortedByFavourite=false;
             sort.putString(SORTED_KEY,SORT_TOP);
             getSupportLoaderManager().restartLoader(MOVIE_THUMBNAIL_LOADER,sort,this);
@@ -225,6 +227,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
        else if(item.equals(fav)){
             sort.putString(SORTED_KEY,SORT_FAVOURITE);
             sortedByFavourite=true;
+            sortedByPopular=false;
+            sortedByTop=false;
             if(getSupportLoaderManager().getLoader(FAVOURITE_LOADER)!=null) {
                 getSupportLoaderManager().restartLoader(FAVOURITE_LOADER, null, new FavouriteLoader());
             }
@@ -300,8 +304,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public void onThumnailClick(int clickedIndex) {
         String clickedMovie=movies.get(clickedIndex).getMovieId();
-        if((getSortPreference().trim().equals(getString(R.string.sort_by_favourite_value).trim()))||
-                sortedByFavourite){
+        if(((getSortPreference().trim().equals(getString(R.string.sort_by_favourite_value).trim()))||
+                sortedByFavourite)&&!sortedByPopular&&!sortedByTop){
             Bundle movie=new Bundle();
             movie.putString(MOVIE_ID,clickedMovie);
             if(getSupportLoaderManager().getLoader(FAVOURTITE_MOVIE_DETAILS)!=null){
@@ -442,11 +446,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                 loaderManager.initLoader(FAVOURITE_LOADER,null,new FavouriteLoader());
             }
             sortedByFavourite=true;
+            sortedByPopular=false;
+            sortedByTop=false;
         }
         else {
             sortedByFavourite=false;
             if(sortBy.equals(getString(R.string.sort_by_popular_value))) sortedByPopular=true;
-            if(sortBy.equals(getString(R.string.sort_by_top_value))) sortedByPopular=false;
+            if(sortBy.equals(getString(R.string.sort_by_top_value))) sortedByTop=true;
             getSupportLoaderManager().restartLoader(MOVIE_THUMBNAIL_LOADER, sort, this);
 
         }
@@ -509,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                         moviesList.add(mov);
                     } while (cursor.moveToNext());
                 }
-                movies=moviesList;
+                    movies=moviesList;
                     if(adapter!=null) {
                         adapter.setMovieData(moviesList);
                     }
@@ -543,6 +549,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                         deliverResult(json);
                     }
                     else {
+                        mLoadingIndicator.setVisibility(View.VISIBLE);
+
                         forceLoad();
                     }
                 }
@@ -575,14 +583,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         @Override
         public void onLoadFinished(Loader<String> loader, String data) {
-                movieJSON=data;
-                MovieDetails movieDetails=null;
+            movieJSON=data;
+            MovieDetails movieDetails=null;
             try {
                  movieDetails=ParseUtility.getFavMovieDeatails(movieJSON);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             launchFavDetails(movieDetails);
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+
         }
 
         @Override

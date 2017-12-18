@@ -11,5 +11,7 @@
     <dimen name="detail_text_marginStart">8dp</dimen>
     <dimen name="detail_text_horizontalBias">0.06</dimen>
     <dimen name="margin_right_overview">8dp</dimen>
+    <dimen name="card_album_radius">5dp</dimen>
+    <dimen name="card_margin">5dp</dimen>
 
 </resources>

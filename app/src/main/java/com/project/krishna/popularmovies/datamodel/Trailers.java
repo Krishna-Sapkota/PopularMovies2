@@ -7,10 +7,6 @@ package com.project.krishna.popularmovies.datamodel;
 public class Trailers {
 
     String id;
-
-
-
-
     String movieId;
     String name;
     String youTubeKey;
