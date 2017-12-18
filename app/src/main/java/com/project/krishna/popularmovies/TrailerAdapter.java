@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.project.krishna.popularmovies.datamodel.Trailers;
 
 /**
  * Created by Krishna on 12/17/17.

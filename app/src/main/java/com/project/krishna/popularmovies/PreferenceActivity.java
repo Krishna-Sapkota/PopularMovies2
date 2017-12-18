@@ -1,6 +1,5 @@
 package com.project.krishna.popularmovies;
 
-import android.content.SharedPreferences;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;

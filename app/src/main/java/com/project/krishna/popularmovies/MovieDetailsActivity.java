@@ -114,6 +114,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         else {
             setFavouriteDisabled(favouriteButton);
         }
+        cursor.close();
 
         favouriteButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -2,7 +2,6 @@ package com.project.krishna.popularmovies.utils;
 
 import android.net.Uri;
 
-import com.project.krishna.popularmovies.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +21,7 @@ public final class NetworkUtility {
     private static final String MOVIE_DB_BASE_PATH="3/movie";
 
 
-    private static final String API_KEY="e258b44703031d92257a4a7eb9907108";
+    private static final String API_KEY="ENTER API KEY HERE";
 
 
     private static final String PARAM_API_KEY="api_key";

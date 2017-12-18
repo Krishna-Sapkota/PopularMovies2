@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.project.krishna.popularmovies.datamodel.MoviesAdapter;
 import com.project.krishna.popularmovies.datamodel.Review;
 
 /**

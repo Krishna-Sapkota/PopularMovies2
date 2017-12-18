@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.project.krishna.popularmovies.datamodel.FavouriteContract;
 import com.project.krishna.popularmovies.datamodel.MovieDetails;
@@ -99,21 +100,25 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
 
 
+        if(isOnline()) {
+            error.setVisibility(View.INVISIBLE);
 
-
-        if(sortBy.trim().equals(getString(R.string.sort_by_favourite_value).trim())) {
-            if (getSupportLoaderManager().getLoader(FAVOURITE_LOADER) != null) {
-                getSupportLoaderManager().restartLoader(FAVOURITE_LOADER, null, new FavouriteLoader());
+            if (sortBy.trim().equals(getString(R.string.sort_by_favourite_value).trim())) {
+                if (getSupportLoaderManager().getLoader(FAVOURITE_LOADER) != null) {
+                    getSupportLoaderManager().restartLoader(FAVOURITE_LOADER, null, new FavouriteLoader());
+                } else {
+                    getSupportLoaderManager().initLoader(FAVOURITE_LOADER, null, new FavouriteLoader());
+                }
+                sortedByFavourite = true;
             } else {
-                getSupportLoaderManager().initLoader(FAVOURITE_LOADER, null, new FavouriteLoader());
+                loaderManager.initLoader(MOVIE_THUMBNAIL_LOADER, sort, this);
             }
-            sortedByFavourite=true;
+
         }
         else {
-            loaderManager.initLoader(MOVIE_THUMBNAIL_LOADER, sort, this);
+            error.setVisibility(View.VISIBLE);
+            error.setText(R.string.internet_error);
         }
-
-
 
     }
 
@@ -187,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             }
         });
         String sortBy=getSortPreference();
+        if(isOnline())
         setSpinnerSelection(sortBy);
         return true;
     }
@@ -262,20 +268,24 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     @Override
     public void onThumnailClick(int clickedIndex) {
-        String clickedMovie=movies.get(clickedIndex).getMovieId();
-        if(((getSortPreference().trim().equals(getString(R.string.sort_by_favourite_value).trim()))||
-                sortedByFavourite)&&!sortedByPopular&&!sortedByTop){
-            Bundle movie=new Bundle();
-            movie.putString(MOVIE_ID,clickedMovie);
-            if(getSupportLoaderManager().getLoader(FAVOURTITE_MOVIE_DETAILS)!=null){
-                getSupportLoaderManager().restartLoader(FAVOURTITE_MOVIE_DETAILS,movie,new MovieDetailsLoader());
+        if(isOnline()) {
+            String clickedMovie = movies.get(clickedIndex).getMovieId();
+            if (((getSortPreference().trim().equals(getString(R.string.sort_by_favourite_value).trim())) ||
+                    sortedByFavourite) && !sortedByPopular && !sortedByTop) {
+                Bundle movie = new Bundle();
+                movie.putString(MOVIE_ID, clickedMovie);
+                if (getSupportLoaderManager().getLoader(FAVOURTITE_MOVIE_DETAILS) != null) {
+                    getSupportLoaderManager().restartLoader(FAVOURTITE_MOVIE_DETAILS, movie, new MovieDetailsLoader());
+                } else {
+                    getSupportLoaderManager().initLoader(FAVOURTITE_MOVIE_DETAILS, movie, new MovieDetailsLoader());
+                }
             }
-            else {
-                getSupportLoaderManager().initLoader(FAVOURTITE_MOVIE_DETAILS, movie, new MovieDetailsLoader());
-            }
+            if (!sortedByFavourite)
+                launchDetail(movieJSON, clickedMovie);
         }
-        if(!sortedByFavourite)
-        launchDetail(movieJSON,clickedMovie);
+        else {
+            Toast.makeText(this,getString(R.string.internet_error),Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -467,7 +477,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                             e.printStackTrace();
                         }
                         String movieId = cursor.getString(cursor.getColumnIndex(MOVIE_ID_INDEX));
-                        Log.i("CUROSR",movieId);
                         mov.setMovieId(movieId);
 
                         mov.setPosterURL(url.toString());
@@ -483,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
                         mMoviesListRecycler.setAdapter(adapter);
 
                     }
+                    cursor.close();
 
 
         }
@@ -519,7 +529,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
                     String json=null;
 
-                    Log.i("LOAD",movieId);
                     Uri.Builder builder=NetworkUtility.getBaseURI();
                     builder.appendPath(movieId);
                     builder.appendQueryParameter(NetworkUtility.getParamApiKey(),NetworkUtility.getApiKey());

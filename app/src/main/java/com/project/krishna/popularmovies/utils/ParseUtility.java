@@ -1,6 +1,5 @@
 package com.project.krishna.popularmovies.utils;
 
-import android.graphics.Movie;
 import android.net.Uri;
 import android.util.Log;
 
@@ -13,8 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -192,6 +189,7 @@ public class ParseUtility {
 
             }
             catch (JSONException e){
+
 
             }
 
