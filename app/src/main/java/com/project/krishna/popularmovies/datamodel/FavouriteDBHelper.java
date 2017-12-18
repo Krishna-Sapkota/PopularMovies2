@@ -13,7 +13,7 @@ public class FavouriteDBHelper extends SQLiteOpenHelper {
 
 
     private static final String DATABASE_NAME="favDb.db";
-    private static final int DB_VERSION=2;
+    private static final int DB_VERSION=3;
 
     FavouriteDBHelper(Context context){
         super(context,DATABASE_NAME,null,DB_VERSION);
@@ -24,7 +24,8 @@ public class FavouriteDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
             final String CREATE_TABLE="CREATE TABLE "+FavouriteEntry.TABLE_NAME + " (" +
                     FavouriteEntry.COLUMN_MOVIE_ID   +" TEXT PRIMARY KEY ,"+
-                    FavouriteEntry.COLUMN_MOVIE_TITLE+" TEXT NOT NULL);";
+                    FavouriteEntry.COLUMN_MOVIE_TITLE+" TEXT NOT NULL ,"+
+                    FavouriteEntry.MOVIE_THUMBNAIL_URL+" TEXT);";
             db.execSQL(CREATE_TABLE);
     }
 

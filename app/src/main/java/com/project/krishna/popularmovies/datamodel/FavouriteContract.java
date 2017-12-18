@@ -20,6 +20,7 @@ public class FavouriteContract {
 
         public static final String COLUMN_MOVIE_ID="movie_id";
         public static final String COLUMN_MOVIE_TITLE="movie_title";
+        public static final String MOVIE_THUMBNAIL_URL="movie_thumb";
 
 
     }

@@ -128,6 +128,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     ContentValues contentValues=new ContentValues();
                     contentValues.put(FavouriteContract.FavouriteEntry.COLUMN_MOVIE_ID,movieDetails.getId());
                     contentValues.put(FavouriteContract.FavouriteEntry.COLUMN_MOVIE_TITLE,movieDetails.getTitle());
+                    contentValues.put(FavouriteContract.FavouriteEntry.MOVIE_THUMBNAIL_URL,movieDetails.getPosterURL());
                     Log.i("TESTID",movieDetails.getId());
                     getContentResolver().insert(FavouriteContract.FavouriteEntry.CONTENT_URI,contentValues);
                     Toast.makeText(MovieDetailsActivity.this,"Added to favourite collection",Toast.LENGTH_SHORT).show();

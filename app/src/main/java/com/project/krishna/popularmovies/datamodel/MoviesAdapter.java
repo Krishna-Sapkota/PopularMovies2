@@ -2,6 +2,7 @@ package com.project.krishna.popularmovies.datamodel;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PosterView
     @Override
     public void onBindViewHolder(PosterViewHolder holder, int position) {
         String posterURL=moviesList.get(position).getPosterURL();
+        Log.i("INSIDE",posterURL);
         Glide.with(context)
                 .load(posterURL)
                 .into(holder.poster);

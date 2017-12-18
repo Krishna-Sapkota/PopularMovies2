@@ -129,6 +129,7 @@ public class ParseUtility {
                 String overview=null;
                 String releaseDate=null;
                 String backdrop=null;
+                String poster=null;
                 String rating=null;
 
                 try {
@@ -137,13 +138,14 @@ public class ParseUtility {
                     overview = movieRoot.getString(MOVIE_OVERVIEW_KEY);
                     releaseDate = movieRoot.getString(MOVIE_RELEASE_KEY);
                     backdrop = movieRoot.getString(MOVIE_BACKDROP_KEY);
+                    poster=movieRoot.getString(POSTER_KEY);
                     rating=movieRoot.getString(MOVIE_RATING_KEY);
                 }
                 catch (JSONException e){
                     e.printStackTrace();
                 }
 
-                movieDetails=new MovieDetails(id,title,backdrop,overview,rating,releaseDate);
+                movieDetails=new MovieDetails(id,title,backdrop,poster,overview,rating,releaseDate);
                 break;
             }
             current++;
@@ -245,6 +247,25 @@ public class ParseUtility {
             current++;
         }
     return reviewList;
+
+    }
+
+
+    public static MovieDetails getFavMovieDeatails(String movieJSON) throws JSONException {
+        JSONObject movie=null;
+        MovieDetails movieDetails=null;
+
+        movie=new JSONObject(movieJSON);
+
+        String id=movie.getString(MOVIE_ID_KEY);
+        String title = movie.getString(MOVIE_TITLE_KEY);
+        String overview = movie.getString(MOVIE_OVERVIEW_KEY);
+        String releaseDate = movie.getString(MOVIE_RELEASE_KEY);
+        String backdrop = movie.getString(MOVIE_BACKDROP_KEY);
+        String poster=movie.getString(POSTER_KEY);
+        String rating=movie.getString(MOVIE_RATING_KEY);
+        movieDetails=new MovieDetails(id,title,backdrop,poster,overview,rating,releaseDate);
+        return movieDetails;
 
     }
 }

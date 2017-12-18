@@ -12,14 +12,25 @@ public class MovieDetails implements Parcelable{
     private String id;
     private String title;
     private String thumbnailURL;
+
+    public String getPosterURL() {
+        return posterURL;
+    }
+
+    public void setPosterURL(String posterURL) {
+        this.posterURL = posterURL;
+    }
+
+    private String posterURL;
     private String overview;
     private String rating;
     private String releaseDate;
 
-    public MovieDetails(String id,String title, String thumbnailURL, String overview, String rating, String releaseDate) {
+    public MovieDetails(String id,String title, String thumbnailURL,String posterURL, String overview, String rating, String releaseDate) {
         this.id=id;
         this.title = title;
         this.thumbnailURL = thumbnailURL;
+        this.posterURL=posterURL;
         this.overview = overview;
         this.rating = rating;
         this.releaseDate = releaseDate;
@@ -69,6 +80,7 @@ public class MovieDetails implements Parcelable{
         this.id=in.readString();
         this.title=in.readString();
         this.thumbnailURL=in.readString();
+        this.posterURL=in.readString();
         this.overview=in.readString();
         this.rating=in.readString();
         this.releaseDate=in.readString();
@@ -84,6 +96,7 @@ public class MovieDetails implements Parcelable{
         parcel.writeString(id);
         parcel.writeString(title);
         parcel.writeString(thumbnailURL);
+        parcel.writeString(posterURL);
         parcel.writeString(overview);
         parcel.writeString(rating);
         parcel.writeString(releaseDate);
