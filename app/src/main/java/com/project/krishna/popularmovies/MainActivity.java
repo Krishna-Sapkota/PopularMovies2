@@ -258,48 +258,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         }
     }
 
-   /* public  class MovieDataLoadTask extends AsyncTask<String,Void,String>{
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String sortPath=strings[0];
-            URL movieDBURL=null;
-            String movieJSON=null;
-
-            try {
-                movieDBURL=NetworkUtility.buildURL(sortPath);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            try {
-                 movieJSON=NetworkUtility.getRespsonseFromHttpUrl(movieDBURL);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return movieJSON;
-        }
-
-        @Override
-        protected void onPostExecute(String movieJSON) {
-            super.onPostExecute(movieJSON);
-            movieDetailsJSON=movieJSON;
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            moviesList = ParseUtility.getMoviesList(movieJSON);
-            RecyclerView.LayoutManager layoutManager;
-            layoutManager = new GridLayoutManager(getApplicationContext(),numberOfColumns());
-            mMoviesListRecycler.setHasFixedSize(true);
-            mMoviesListRecycler.setLayoutManager(layoutManager);
-            MoviesAdapter adapter = new MoviesAdapter(getApplicationContext(), moviesList,MainActivity.this);
-            mMoviesListRecycler.setAdapter(adapter);
-        }
-    }*/
 
     @Override
     public void onThumnailClick(int clickedIndex) {

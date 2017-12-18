@@ -6,8 +6,9 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/scroller_margin"
-    android:fillViewport="false">
-
+    android:fillViewport="false"
+    >
+    />
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -102,24 +103,25 @@
     app:layout_constraintTop_toBottomOf="@id/tv_overview"
     app:layout_constraintLeft_toRightOf="parent"
     android:visibility="invisible"/>
-<include
-    android:id="@+id/trailer_list"
-    layout="@layout/trailer_view"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:layout_constraintTop_toBottomOf="@id/tv_overview"
-    app:layout_constraintLeft_toLeftOf="parent"
-    android:layout_marginTop="32dp"/>
+
+    <include
+        android:id="@+id/trailer_list"
+        layout="@layout/trailer_view"
+        android:layout_width="331dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/detail_marginTop"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_overview" />
+
     <include
         android:id="@+id/review_list"
         layout="@layout/review_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/trailer_list"
-        app:layout_constraintRight_toLeftOf="parent"
-        android:layout_marginTop="@dimen/detail_marginTop"
-        />
-
+        android:layout_marginLeft="92dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toRightOf="@id/trailer_list"
+        app:layout_constraintTop_toBottomOf="@id/tv_overview" />
 
     <ImageButton
         android:id="@+id/favourite_button"

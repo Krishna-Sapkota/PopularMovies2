@@ -54,6 +54,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private String mRatingFull;
     private RecyclerView recyclerViewReview;
     boolean isFavouriteEnable=false;
+    TextView mLoadingTrailers;
 
 
     ListView trailerList;
@@ -70,6 +71,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mRelease=findViewById(R.id.tv_release);
         trailerList=findViewById(R.id.lv_trailer_list);
         recyclerViewReview=findViewById(R.id.rv_reviews);
+        mLoadingTrailers=findViewById(R.id.tv_loading_trailer_message);
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -227,6 +229,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
                              if (trailers != null) {
                                  deliverResult(trailers);
                              } else {
+                                 mLoadingTrailers.setText(getString(R.string.trailer_loading_message));
+                                 mLoadingTrailers.setVisibility(View.VISIBLE);
                                  forceLoad();
                              }
                          }
@@ -266,6 +270,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
          @Override
          public void onLoadFinished(Loader<Trailers[]> loader, final Trailers[] data) {
              trailers=data;
+             mLoadingTrailers.setVisibility(View.GONE);
              String[] trailerNames = new String[data.length];
              int[] playIcons = new int[data.length];
              String[] ids=new String[data.length];
