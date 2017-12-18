@@ -41,7 +41,6 @@ public class TrailerAdapter extends BaseAdapter{
 
 
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
         return position;
     }
 

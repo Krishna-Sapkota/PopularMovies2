@@ -21,10 +21,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         PreferenceScreen prefScreen = getPreferenceScreen();
         int count = prefScreen.getPreferenceCount();
 
-        // Go through all of the preferences, and set up their preference summary.
         for (int i = 0; i < count; i++) {
             Preference p = prefScreen.getPreference(i);
-
             String value = sharedPreferences.getString(p.getKey(), "");
             setPreferenceSummary(p, value);
 
@@ -38,7 +36,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             ListPreference listPreference = (ListPreference) preference;
             int prefIndex = listPreference.findIndexOfValue(value);
             if (prefIndex >= 0) {
-                // Set the summary to that label
                 listPreference.setSummary(listPreference.getEntries()[prefIndex]);
             }
         }
@@ -48,7 +45,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference preference = findPreference(key);
         if (null != preference) {
-            // Updates the summary for the preference
                 String value = sharedPreferences.getString(preference.getKey(), "");
                 setPreferenceSummary(preference, value);
         }
