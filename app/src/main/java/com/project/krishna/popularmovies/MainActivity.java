@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
@@ -17,7 +19,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private static final int FAVOURITE_LOADER = 11;
     private static final int FAVOURTITE_MOVIE_DETAILS =12 ;
     private static final String MOVIE_ID ="movie_key" ;
+    private static final String LIST_STATE ="scroll" ;
     private TextView error;
     private RecyclerView mMoviesListRecycler;
     public  ProgressBar mLoadingIndicator;
@@ -69,8 +71,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private MoviesAdapter adapter;
     private static String movieJSON;
 
+
     final static String MOVIE_ID_INDEX= FavouriteContract.FavouriteEntry.COLUMN_MOVIE_ID;
     final static String MOVIE_POSTER_INDEX= FavouriteContract.FavouriteEntry.MOVIE_THUMBNAIL_URL;
+    RecyclerView.LayoutManager layoutManager;
+    Parcelable listScroll;
+    private int lastScrollPosition=0;
+    Bundle saved;
 
 
     @Override
@@ -84,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mMoviesListRecycler=(RecyclerView)findViewById(R.id.rv_movies_list);
         mLoadingIndicator=(ProgressBar)findViewById(R.id.progressBar);
         error=findViewById(R.id.tv_error_message);
-        RecyclerView.LayoutManager layoutManager;
         layoutManager = new GridLayoutManager(this,numberOfColumns());
         mMoviesListRecycler.setHasFixedSize(true);
         mMoviesListRecycler.setLayoutManager(layoutManager);
+
 
         LoaderManager loaderManager=getSupportLoaderManager();
         Loader<List<Movies>> loader=loaderManager.getLoader(MOVIE_THUMBNAIL_LOADER);
@@ -96,7 +103,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         sort.putString(SORTED_KEY,sortBy);
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        if(savedInstanceState!=null) {
 
+        }
 
 
 
@@ -119,6 +128,17 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             error.setVisibility(View.VISIBLE);
             error.setText(R.string.internet_error);
         }
+        if(savedInstanceState!=null){
+            listScroll=savedInstanceState.getParcelable(LIST_STATE);
+
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mMoviesListRecycler.getLayoutManager().onRestoreInstanceState(listScroll);
+                }
+            }, 300);
+        }
 
     }
 
@@ -127,34 +147,26 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         return sharedPreferences.getString(getString(R.string.sort_key),getString(R.string.default_sort));
     }
 
-    /**
-     * save the sort order to display same sorting when screen rotates
 
-     * @param outState
+    /** this method saves the scroll state of the moive list
+     *
+     * @param outState bundle that is set to store the state of recyclerview
      */
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(SORTED_KEY,sortedByPopular);
-
+        outState.putParcelable(LIST_STATE, mMoviesListRecycler.getLayoutManager().onSaveInstanceState());
     }
+
+
+
     public static String getParceableKey() {
         return PARCEABLE_KEY;
     }
 
 
-  /*  private void loadMoviesThumnail(String sortBy) {
 
-        if(isOnline()) {
-            error.setVisibility(View.INVISIBLE);
-            MovieDataLoadTask movieDataLoadTask = new MovieDataLoadTask();
-            movieDataLoadTask.execute(sortBy);
-        }
-        else {
-            error.setText(getResources().getString(R.string.internet_error));
-            error.setVisibility(View.VISIBLE);
-        }
-    }*
 
     /**
      * Creating spinner on toolbar from
@@ -387,7 +399,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         adapter = new MoviesAdapter(this, movies, MainActivity.this);
         mMoviesListRecycler.setAdapter(adapter);
-
     }
 
     @Override
@@ -403,7 +414,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         setSpinnerSelection(sortBy);
 
         if(sortBy.trim().equals(getString(R.string.sort_by_favourite_value).trim())){
-            Log.i("SORT",sortBy);
 
             LoaderManager loaderManager=getSupportLoaderManager();
             Loader<List<Movies>> loader=loaderManager.getLoader(FAVOURITE_LOADER);
@@ -568,4 +578,5 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         }
     }
+
 }

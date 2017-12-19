@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.AsyncTaskLoader;
@@ -23,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +48,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private static final int TRAILER_LOADER =20;
     private static final int REVIEW_LOADER = 21;
     private static final String REVIEW_PATH ="reviews" ;
+    private static final String REVIEW_LIST_STATE ="reviewstate" ;
+    private static final String DETAILS_SCROLL_POSITION ="details_scroll" ;
+    private static final String TRAILER_SCROLL ="trailer_scroll" ;
     private String movieId;
     private TextView mTitle;
     private ImageView mMovieThumbnail;
@@ -53,8 +59,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private TextView mRating;
     private String mRatingFull;
     private RecyclerView recyclerViewReview;
+    private ScrollView mScrollView;
     boolean isFavouriteEnable=false;
     TextView mLoadingTrailers;
+    Parcelable reviewListState;
+    Parcelable trailerListState;
 
 
     ListView trailerList;
@@ -72,6 +81,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         trailerList=findViewById(R.id.lv_trailer_list);
         recyclerViewReview=findViewById(R.id.rv_reviews);
         mLoadingTrailers=findViewById(R.id.tv_loading_trailer_message);
+        mScrollView=findViewById(R.id.sv_md);
 
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -144,6 +154,24 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
         getSupportLoaderManager().initLoader(TRAILER_LOADER,null,new TrailerLoader());
         getSupportLoaderManager().initLoader(REVIEW_LOADER,null,new ReviewLoader());
+        if(savedInstanceState!=null){
+            reviewListState=savedInstanceState.getParcelable(REVIEW_LIST_STATE);
+            trailerListState=savedInstanceState.getParcelable(TRAILER_SCROLL);
+            new Handler().postDelayed(new Runnable(){
+                @Override
+                public void run() {
+                    recyclerViewReview.getLayoutManager().onRestoreInstanceState(reviewListState);
+                }
+            },300);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    trailerList.onRestoreInstanceState(trailerListState);
+                }
+            },300);
+
+        }
 
     }
     @Override
@@ -180,6 +208,28 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 Toast.makeText(this,"Trailers not loaded",Toast.LENGTH_SHORT).show();
             }
 
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(TRAILER_SCROLL,trailerList.onSaveInstanceState());
+        outState.putParcelable(REVIEW_LIST_STATE, recyclerViewReview.getLayoutManager().onSaveInstanceState());
+        outState.putIntArray(DETAILS_SCROLL_POSITION,
+                new int[]{ mScrollView.getScrollX(), mScrollView.getScrollY()});
+
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        final int[] position = savedInstanceState.getIntArray(DETAILS_SCROLL_POSITION);
+        if(position != null)
+            mScrollView.post(new Runnable() {
+                public void run() {
+                    mScrollView.scrollTo(position[0], position[1]);
+                }
+            });
     }
 
     @Override

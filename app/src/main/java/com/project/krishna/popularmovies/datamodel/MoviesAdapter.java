@@ -23,6 +23,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PosterView
     final private MovieThumbnailClickListener mOnClickListener;
 
     public void setMovieData(List<Movies> movieData) {
+        Log.i("IN","Insde set movie");
         this.moviesList = movieData;
         notifyDataSetChanged();
     }
